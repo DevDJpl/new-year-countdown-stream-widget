@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Countdown Timer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 10rem 0 0 4rem;
+    background: transparent;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100vh;
+    font-family: 'Bebas Neue', Arial, sans-serif;
+    line-height: 1;
+  }
+
+  .timer-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-150%);
+  }
+
+  .slide-in {
+    animation: slideIn 1.25s forwards;
+  }
+
+  .slide-out {
+    animation: slideOut 1.25s forwards;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(-150%); }
+    to { transform: translateX(0); }
+  }
+
+  @keyframes slideOut {
+    from { transform: translateX(0); }
+    to { transform: translateX(-150%); }
+  }
+
+  .new-year-banner {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: -67px;
+    width: 512px;
+    height: 200px;
+  }
+
+  .banner-background {
+    position: absolute;
+    width: 512px;
+    height: 200px;
+    background: url('./images/fireworks1.png') no-repeat center/contain;
+    border-radius: 15px;
+    z-index: -1;
+  }
+
+  .overlay-text {
+    position: absolute;
+    top: 0;
+    transform: translateY(150%);
+    font-size: 4rem;
+    color: #fff;
+    z-index: 2;
+    pointer-events: none;
+    white-space: nowrap;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+  }
+
+  .timer-container {
+    display: flex;
+    padding: 30px 25px 30px 25px;
+    background: #e52200;
+    border-radius: 15px;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .time-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .digits-colon {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .digits-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .digits-row {
+    display: flex;
+    justify-content: center; 
+    gap: 5px;
+    position: relative;
+  }
+
+  .digit {
+    width: 45px;
+    height: 60px;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    font-size: 2rem;
+    font-weight: 700;
+    user-select: none;
+  }
+
+  .colon {
+    font-size: 2rem;
+    color: #fff;
+  }
+
+  .label {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.9rem;
+    color: #fff;
+    white-space: nowrap;
+    margin-top: 5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="timer-wrapper" id="timer-wrapper">
+  <div class="new-year-banner">
+    <div class="banner-background"></div>
+    <div class="overlay-text">NEW YEAR</div>
+  </div>
+
+  <div class="timer-container">
+    <!-- Days -->
+    <div class="time-block">
+      <div class="digits-colon">
+        <div class="digits-wrapper">
+          <div class="digits-row">
+            <div class="digit" id="d1">0</div>
+            <div class="digit" id="d2">0</div>
+            <div class="digit" id="d3">0</div>
+          </div>
+          <div class="label">Days</div>
+        </div>
+        <div class="colon">:</div>
+      </div>
+    </div>
+
+    <!-- Hours -->
+    <div class="time-block">
+      <div class="digits-colon">
+        <div class="digits-wrapper">
+          <div class="digits-row">
+            <div class="digit" id="h1">0</div>
+            <div class="digit" id="h2">0</div>
+          </div>
+          <div class="label">Hours</div>
+        </div>
+        <div class="colon">:</div>
+      </div>
+    </div>
+
+    <!-- Minutes -->
+    <div class="time-block">
+      <div class="digits-colon">
+        <div class="digits-wrapper">
+          <div class="digits-row">
+            <div class="digit" id="m1">0</div>
+            <div class="digit" id="m2">0</div>
+          </div>
+          <div class="label">Minutes</div>
+        </div>
+        <div class="colon">:</div>
+      </div>
+    </div>
+
+    <!-- Seconds -->
+    <div class="time-block">
+      <div class="digits-colon">
+        <div class="digits-wrapper">
+          <div class="digits-row">
+            <div class="digit" id="s1">0</div>
+            <div class="digit" id="s2">0</div>
+          </div>
+          <div class="label">Seconds</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const digits = {
+  d1: document.getElementById('d1'),
+  d2: document.getElementById('d2'),
+  d3: document.getElementById('d3'),
+  h1: document.getElementById('h1'),
+  h2: document.getElementById('h2'),
+  m1: document.getElementById('m1'),
+  m2: document.getElementById('m2'),
+  s1: document.getElementById('s1'),
+  s2: document.getElementById('s2')
+};
+
+const timerWrapper = document.getElementById('timer-wrapper');
+const daysBlock = timerWrapper.querySelector('.time-block:first-child');
+const newYear = new Date(new Date().getFullYear() + 1,0,1,0,0,0);
+
+function updateTimer() {
+  const now = new Date();
+  let total = Math.ceil((newYear - now)/1000);
+
+  if(total < 0){
+    timerWrapper.style.display = 'none';
+    clearInterval(timerInterval);
+    return;
+  }
+
+  const days = Math.floor(total / 86400);
+  let remainder = total % (3600*24);
+  const hours = Math.floor(remainder/3600);
+  remainder %= 3600;
+  const minutes = Math.floor(remainder/60);
+  const seconds = remainder % 60;
+
+  if (days > 0) {
+    daysBlock.style.display = 'flex';
+    const dHundreds = Math.floor(days / 100);
+    const dTens = Math.floor((days % 100) / 10);
+    const dOnes = days % 10;
+    digits.d1.textContent = dHundreds;
+    digits.d2.textContent = dTens;
+    digits.d3.textContent = dOnes;
+    digits.d1.style.visibility = days < 100 ? 'hidden' : 'visible';
+  } else {
+    daysBlock.style.display = 'none';
+  }
+
+  const values = [
+    Math.floor(hours/10), hours%10,
+    Math.floor(minutes/10), minutes%10,
+    Math.floor(seconds/10), seconds%10
+  ];
+  const keys = ['h1','h2','m1','m2','s1','s2'];
+  keys.forEach((key,i)=>digits[key].textContent = values[i]);
+
+  const secondsRemaining = total;
+  if(secondsRemaining <= 600) {
+    // less than 10 minutes → always visible
+    timerWrapper.classList.add('slide-in');
+    timerWrapper.classList.remove('slide-out');
+  } else if(secondsRemaining <= 1800) {
+    // less than 30 minutes → show every 10 minutes for 1 minute
+    if(minutes % 10 === 0 && seconds === 0) showBanner(60000);
+  } else {
+    // more than 30 minutes → show every 30 minutes for 1 minute
+    if(minutes % 30 === 0 && seconds === 0) showBanner(60000);
+  }
+}
+
+function showBanner(duration=60000) {
+  timerWrapper.classList.remove('slide-out');
+  timerWrapper.classList.add('slide-in');
+  setTimeout(()=>{
+    timerWrapper.classList.remove('slide-in');
+    timerWrapper.classList.add('slide-out');
+  }, duration);
+}
+
+showBanner(60000);
+updateTimer();
+const timerInterval = setInterval(updateTimer,1000);
+</script>
+
+</body>
+</html>
